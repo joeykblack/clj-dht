@@ -1,5 +1,6 @@
 (ns dht.test
-  (:use [dht.node]))
+  (:use [dht.node])
+  (:use [dht.net]))
 
 (def node (make-node "1.0.0.1"))
 
@@ -9,6 +10,9 @@
 (def node1 (make-node "1.0.0.2"))
 
 (add-node node (:ip node1))
+
+
+
 
 
 
