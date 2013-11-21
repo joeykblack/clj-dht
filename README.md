@@ -1,4 +1,4 @@
-# blind-swordsman 0.0.1
+# dht 0.0.1
 
 by [Joey K Black](joey-black.appspot.com)
 
@@ -7,7 +7,7 @@ This is an academic project to explore some of the technical challenges of creat
 * Anonymous
 * Decentralized
 
-This project is for information purposes only. It is not intended to address any moral or legal issues. I do not take responsibility for the use or misuse of this code.  
+This project is for information purposes only. It is not intended to address any moral or legal issues. I do not take responsibility for the use or misuse of this code.
 
 ## Usage
 
@@ -40,3 +40,4 @@ Consumption steps:
 Copyright © 2013
 
 Distributed under the Eclipse Public License, the same as Clojure.
+
