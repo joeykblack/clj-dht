@@ -8,7 +8,11 @@
 (defn- do-call [node keyval]
   (let [method (ns-resolve 'dht.node (symbol (name (key keyval))))
         values (val keyval)]
-    (method node values)
+    (if (nil? method)
+      (do
+        (error "Method" (key keyval) "does not exist!")
+        node)
+      (method node values))
     node))
 
 (defn- process-request [node request]
@@ -24,7 +28,9 @@
      (fn [request]
        (dosync
         ;(info "Request:" request)
-        (swap! node process-request request)
+        (let [newnode (process-request @node request)]
+          (info "Result:" newnode)
+          (swap! node process-request request))
         {:status 200
          :headers {"Content-Type" "text/html"}
          :body "OK"}))
@@ -41,4 +47,6 @@
 
 (defn start-node-server [server]
   (.start server))
+
+
 

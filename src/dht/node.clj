@@ -26,16 +26,16 @@
 ;;      {:key key
 ;;       :return-to where to return value}}
 
-(defn- forward-get [this map]
+(defn- forward-get [this params]
   (send-content
-   (get-next this (:key map))
-   {:get-value map}))
+   (get-next this (:key params))
+   {:get-value params}))
 
-(defn get-value [this map]
-  (if (responsible? this (:key map))
-    (return-content (:return-to map)
-                    (get (:map this) (:key map)))
-    (forward-get this map)))
+(defn get-value [this params]
+  (if (responsible? this (:key params))
+    (return-content (:return-to params)
+                    (get (:map this) (:key params)))
+    (forward-get this params)))
 
 
 ;; Put
@@ -43,15 +43,17 @@
 ;;      {:key key
 ;;       :value value}}
 
-(defn- forward-put [this map]
+(defn- forward-put [this params]
   (send-content
-   (get-next this (:key map))
-   {:put-value map}))
+   (get-next this (:key params))
+   {:put-value params}))
 
-(defn put-value [this map]
-  (if (responsible? this map)
-    (assoc-in this [:map (:key map)] (:value map))
-    (forward-put this map)))
+(defn put-value [this params]
+  (if (responsible? this params)
+    (do
+      (info "Input:" this params)
+      (assoc-in this [:map (:key params)] (:value params)))
+    (forward-put this params)))
 
 
 ;; Add Node
@@ -107,8 +109,10 @@
 
 
 
-(defn test-method [this map]
-  (info "test-method" this map))
+(defn test-method [this params]
+  (info "test-method" this params))
+
+
 
 
 
