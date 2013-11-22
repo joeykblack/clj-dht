@@ -9,13 +9,19 @@
                  [ring/ring-jetty-adapter "1.2.0"]
                  [ring/ring-json "0.2.0"]
                  [clj-http "0.7.7"]
-                 [org.clojure/data.json "0.2.3"]]
+                 [org.clojure/tools.logging "0.2.6"]]
   :dev-dependencies [[ring-serve "0.1.2"]]
   :profiles {:dev {:dependencies [[midje "1.5.1"]]}}
   :plugins [[lein-midje "3.0.0"]
             [lein-ring "0.8.7"]]
-  :aot :all
-  :ring {:handler dht.net/app})
+  :aot :all)
+  ;:ring {:handler dht.net/app})
+
+
+
+
+
+
 
 
 

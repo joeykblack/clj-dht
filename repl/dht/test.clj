@@ -2,14 +2,20 @@
   (:use [dht.node])
   (:use [dht.net]))
 
-(def node (make-node "1.0.0.1"))
+; Start/stop node
 
-(put-value node {:key :key1 :value :a})
+(use 'dht.net.serve)
+(defonce server1 (make-node-server "http://localhost:3001" 3001))
+(use 'dht.net.send)
+(send-content "http://localhost:3001" {:test-method {:test 'test}})
+(.stop server1)
+(exit)
+
+(.start server1)
 
 
-(def node1 (make-node "1.0.0.2"))
 
-(add-node node (:ip node1))
+
 
 
 

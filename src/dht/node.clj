@@ -1,33 +1,35 @@
 (ns dht.node
   (:use [dht.hash])
-  (:use [dht.net]))
+  (:use [dht.net.send])
+  (:use [clojure.tools.logging :only (info debug error)]))
 
-(defn make-node [ip]
-  {:ip ip ; ip of this node
-   :next nil ; ip of next node
-   :last nil ; ip of last node
+(defn make-node [url]
+  {:url url ; url of this node
+   :next url ; url of next node
+   :last url ; url of last node
    :map {}}) ; map sha -> value
 
 
 (defn- responsible? [this key]
-  (or (nil? (:last this))
-    (and
-     (>= (sha1 (:last this)) key) ; key >= last node
-     (< key (sha1 (:ip this)))))) ; key < this node
+  (or (= (:url this) (:last this))
+      ; last node <= key < this node
+      (and
+       (>= (sha1 (:last this)) key)
+       (< key (sha1 (:url this))))))
 
 (defn- get-next [this key]
   (:next this))
 
 
 ;; Get
-;; {:type get-value
-;;      :key key
-;;      :return-to where to return value}
+;; {:get-value
+;;      {:key key
+;;       :return-to where to return value}}
 
 (defn- forward-get [this map]
   (send-content
    (get-next this (:key map))
-   (assoc map :type 'get-value)))
+   {:get-value map}))
 
 (defn get-value [this map]
   (if (responsible? this (:key map))
@@ -37,14 +39,14 @@
 
 
 ;; Put
-;;    {:type put-value
-;;      :key key
-;;      :value value}
+;;    {put-value
+;;      {:key key
+;;       :value value}}
 
 (defn- forward-put [this map]
   (send-content
    (get-next this (:key map))
-   (assoc map :type 'put-value)))
+   {:put-value map}))
 
 (defn put-value [this map]
   (if (responsible? this map)
@@ -61,46 +63,55 @@
   (merge this new-key-values))
 
 
-(defn- call-set-pointers [this ip]
+(defn- call-set-pointers [this url]
   (send-content
    (:last this)
-   {:type 'set-pointers
-    :next ip})
+   {:set-pointers
+    {:next url}})
   (send-content
-   ip
-   {:type 'set-pointers
-    :last (:last this)
-    :next (:ip this)}))
+   url
+   {:set-pointers
+    {:last (:last this)
+     :next (:url this)}}))
 
-(defn- call-transfer-keys [this ip]
+(defn- call-transfer-keys [this url]
   (send-content
-   ip
-   {:type 'transfer-keys
-    :map (filter
-          #(not (responsible? this (key %1)))
-          (:map this))}))
+   url
+   {:transfer-keys
+    {:map (filter
+           #(not (responsible? this (key %1)))
+           (:map this))}}))
 
-(defn- handle-add-node [this ip]
-  (call-set-pointers this ip)
-  (let [updated (assoc this :last ip)] ; update last
+(defn- handle-add-node [this url]
+  (call-set-pointers this url)
+  (let [updated (assoc this :last url)] ; update last
     ; trasfer keys to new node
-    (call-transfer-keys updated ip)
+    (call-transfer-keys updated url)
     (assoc updated :map
       (filter
        #(responsible? updated (key %1))
        (:map updated)))))
 
-(defn- call-add-node [this ip]
+(defn- call-add-node [this url]
   (send-content
-   (get-next this ip)
-   {:type 'add-node
-    :ip ip}))
+   (get-next this url)
+   {:add-node
+    {:url url}}))
 
-(defn add-node [this ip]
-  (let [sha (sha1 ip)]
+(defn add-node [this url]
+  (let [sha (sha1 url)]
     (if (responsible? this sha)
-      (handle-add-node this ip)
-      (call-add-node this ip))))
+      (handle-add-node this url)
+      (call-add-node this url))))
+
+
+
+
+(defn test-method [this map]
+  (info "test-method" this map))
+
+
+
 
 
 
