@@ -20,6 +20,13 @@
 (defn- get-next [this key]
   (:next this))
 
+;; Receive Content
+;; {:receive-content
+;;   {:value value that I asked for}}
+(defn receive-content [this params]
+  (info "Receiving:" (:value params))
+  this)
+
 
 ;; Get
 ;; {:get-value
@@ -34,8 +41,10 @@
 (defn get-value [this params]
   (if (responsible? this (:key params))
     (return-content (:return-to params)
-                    (get (:map this) (:key params)))
-    (forward-get this params)))
+                    {:receive-content
+                     {:value (get (:map this) (:key params))}})
+    (forward-get this params))
+  this)
 
 
 ;; Put
@@ -50,36 +59,27 @@
 
 (defn put-value [this params]
   (if (responsible? this params)
-    (do
-      (info "Input:" this params)
-      (assoc-in this [:map (:key params)] (:value params)))
-    (forward-put this params)))
+    (assoc-in this [:map (:key params)] (:value params))
+    (do (forward-put this params) this)))
 
 
 ;; Add Node
 
-(defn set-pointers [this pointers]
-  (merge this pointers))
-
-(defn transfer-keys [this new-key-values]
-  (merge this new-key-values))
-
-
 (defn- call-set-pointers [this url]
   (send-content
    (:last this)
-   {:set-pointers
+   {:update-node
     {:next url}})
   (send-content
    url
-   {:set-pointers
+   {:update-node
     {:last (:last this)
      :next (:url this)}}))
 
 (defn- call-transfer-keys [this url]
   (send-content
    url
-   {:transfer-keys
+   {:update-node
     {:map (filter
            #(not (responsible? this (key %1)))
            (:map this))}}))
@@ -96,21 +96,32 @@
 
 (defn- call-add-node [this url]
   (send-content
-   (get-next this url)
+   (get-next this (sha1 url))
    {:add-node
     {:url url}}))
 
-(defn add-node [this url]
-  (let [sha (sha1 url)]
+
+(defn update-node [this params]
+  (merge this params))
+
+(defn add-node [this params]
+  (let [url (:url params)
+        sha (sha1 url)]
     (if (responsible? this sha)
       (handle-add-node this url)
-      (call-add-node this url))))
+      (do (call-add-node this url) this))))
 
 
+;; Util
+
+(defn log-node-state [this params]
+  (info "node-state:" this)
+  this)
+
+(defn reset-node [this params]
+  (make-node (:url params)))
 
 
-(defn test-method [this params]
-  (info "test-method" this params))
 
 
 
