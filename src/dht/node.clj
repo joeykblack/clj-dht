@@ -14,8 +14,8 @@
   (or (= (:url this) (:last this))
       ; last node <= key < this node
       (and
-       (>= (sha1 (:last this)) key)
-       (< key (sha1 (:url this))))))
+       (>= (compare (sha1 (:last this)) key) 0)
+       (< (compare key (sha1 (:url this)))) 0)))
 
 (defn- get-next [this key]
   (:next this))
@@ -66,10 +66,11 @@
 ;; Add Node
 
 (defn- call-set-pointers [this url]
-  (send-content
-   (:last this)
-   {:update-node
-    {:next url}})
+  (if (not= (:url this) (:last this))
+    (send-content
+     (:last this)
+     {:update-node
+      {:next url}}))
   (send-content
    url
    {:update-node
@@ -89,10 +90,15 @@
   (let [updated (assoc this :last url)] ; update last
     ; trasfer keys to new node
     (call-transfer-keys updated url)
-    (assoc updated :map
+    (assoc updated
+      :map
       (filter
        #(responsible? updated (key %1))
-       (:map updated)))))
+       (:map updated))
+      :next
+      (if (= (:url this) (:last this))
+        url
+        (:next this)))))
 
 (defn- call-add-node [this url]
   (send-content
@@ -120,6 +126,8 @@
 
 (defn reset-node [this params]
   (make-node (:url params)))
+
+
 
 
 

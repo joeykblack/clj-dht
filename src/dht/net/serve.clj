@@ -14,6 +14,7 @@
 
 (defn- process-request [node request]
   (let [calls (get-in request [:body :dht])]
+    ;(info "request" calls)
     (if (not (nil? calls))
       (reduce do-call node calls)
       node)))
@@ -43,6 +44,8 @@
 
 (defn start-node-server [server]
   (.start server))
+
+
 
 
 
