@@ -21,16 +21,15 @@
 
 ;; Make handler with persistent node
 (defn- make-handler [url port]
-  (let [node (atom (make-node url))]
+  (let [node (agent (make-node url))]
     (wrap-json-body
      (fn [request]
-       (dosync
-        (info "Start:" (:url @node))
-        (swap! node process-request request)
-        (info "End:" (:url @node))
-        {:status 200
-         :headers {"Content-Type" "text/html"}
-         :body "OK"}))
+       (info "Start:" (:url @node))
+       (send node process-request request)
+       (info "End:" (:url @node))
+       {:status 200
+        :headers {"Content-Type" "text/html"}
+        :body "OK"})
      {:keywords? true})))
 
 
@@ -44,6 +43,8 @@
 
 (defn start-node-server [server]
   (.start server))
+
+
 
 
 

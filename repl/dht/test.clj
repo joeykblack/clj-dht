@@ -9,7 +9,7 @@
 
 (defonce server3 (make-node-server "http://localhost:3003" 3003))
 
-(send-content "http://localhost:3001" {:add-node {:url "http://localhost:3003"}})
+(send-content-test "http://localhost:3001" {:add-node {:url "http://localhost:3003"}})
 
 
 (send-content-test "http://localhost:3001" {:log-node-state {}})
@@ -25,6 +25,8 @@
 (.stop server1)
 (.stop server2)
 (.start server1)
+
+
 
 
 
