@@ -39,11 +39,12 @@
    {:get-value params}))
 
 (defn get-value [this params]
-  (if (responsible? this (:key params))
-    (return-content (:return-to params)
-                    {:receive-content
-                     {:value (get (:map this) (:key params))}})
-    (forward-get this params))
+  (let [sha (sha1 (:key params))]
+    (if (responsible? this sha)
+      (return-content (:return-to params)
+                      {:receive-content
+                       {:value (get (:map this) sha)}})
+      (forward-get this params)))
   this)
 
 
@@ -58,9 +59,10 @@
    {:put-value params}))
 
 (defn put-value [this params]
-  (if (responsible? this params)
-    (assoc-in this [:map (:key params)] (:value params))
-    (do (forward-put this params) this)))
+  (let [sha (sha1 (:key params))]
+    (if (responsible? this sha)
+      (assoc-in this [:map sha] (:value params))
+      (do (forward-put this params) this))))
 
 
 ;; Add Node
@@ -81,9 +83,10 @@
   (send-content
    url
    {:update-node
-    {:map (filter
-           #(not (responsible? this (key %1)))
-           (:map this))}}))
+    {:map (into {}
+            (filter
+             (fn [[k val]] (not (responsible? this k)))
+             (:map this)))}}))
 
 (defn- handle-add-node [this url]
   (call-set-pointers this url)
@@ -92,9 +95,10 @@
     (call-transfer-keys updated url)
     (assoc updated
       :map
-      (filter
-       #(responsible? updated (key %1))
-       (:map updated))
+      (into {}
+            (filter
+             (fn [[k val]] (responsible? updated k))
+             (:map updated)))
       :next
       (if (= (:url this) (:last this))
         url
@@ -126,6 +130,8 @@
 
 (defn reset-node [this params]
   (make-node (:url params)))
+
+
 
 
 
