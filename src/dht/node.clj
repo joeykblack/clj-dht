@@ -11,6 +11,8 @@
 
 
 (defn- responsible? [this key]
+  (if (not (vector? key))
+    (error "In responsible?:" key "is not a vector."))
   (let [myurl (:url this)
         mysha (sha1 myurl)
         last (:last this)
@@ -137,11 +139,19 @@
 ;; Util
 
 (defn log-node-state [this params]
-  (info "node-state:" this)
+  (info "Node:" (:last this) ">" (:url this) ">" (:next this))
+  (info "  Values:" (map val (:map this)))
+  this)
+
+(defn log-node-state-full [this params]
+  (info "Node:" (:last this) ">" (:url this) ">" (:next this))
+  (info "  Map:" (:map this))
   this)
 
 (defn reset-node [this params]
   (make-node (:url params)))
+
+
 
 
 
