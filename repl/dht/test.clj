@@ -64,6 +64,9 @@
 (.stop server1)
 (.stop server2)
 (.stop server3)
+(.stop server4)
+(.stop server5)
+(.stop server6)
 
 (.start server1)
 
