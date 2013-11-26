@@ -11,25 +11,25 @@
 
 
 (defn- responsible? [this key]
-  (if (not (vector? key))
-    (error "In responsible?:" key "is not a vector."))
   (let [myurl (:url this)
         mysha (sha1 myurl)
         last (:last this)
         shalast (sha1 last)]
-    (or (= myurl last) ; only one node
-        ; last node <= key < this node
-        (and
-         (<= (compare shalast key) 0)
-         (< (compare key mysha) 0))
-        ; this node < last node <= key (key is after largest node)
-        (and
-         (< (compare mysha shalast) 0)
-         (<= (compare shalast key) 0))
-        ; key < this node < last node (key is before smallest node)
-        (and
-         (< (compare key mysha) 0)
-         (< (compare mysha shalast) 0)))))
+    (or
+     ; only one node
+     (= myurl last)
+     ; last node <= key < this node
+     (and
+      (<= (compare shalast key) 0)
+      (< (compare key mysha) 0))
+     ; this node < last node <= key (key is after largest node)
+     (and
+      (< (compare mysha shalast) 0)
+      (<= (compare shalast key) 0))
+     ; key < this node < last node (key is before smallest node)
+     (and
+      (< (compare key mysha) 0)
+      (< (compare mysha shalast) 0)))))
 
 (defn- get-next [this key]
   (:next this))
@@ -150,6 +150,8 @@
 
 (defn reset-node [this params]
   (make-node (:url params)))
+
+
 
 
 

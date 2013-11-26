@@ -7,14 +7,13 @@
 
 (defn- do-call [node keyval]
   (let [method (ns-resolve 'dht.node (symbol (name (key keyval))))
-        values (into {} (for [[k v] (val keyval)] [(keyword k) v]))]
+        params (into {} (for [[k v] (val keyval)] [(keyword k) v]))]
     (if (nil? method)
       (do (error "Method" (key keyval) "does not exist!") node)
-      (method node values))))
+      (method node params))))
 
 (defn- process-request [node request]
   (let [calls (get-in request [:body "dht"])]
-    ;(info "request" calls)
     (if (not (nil? calls))
       (reduce do-call node calls)
       node)))
@@ -29,13 +28,10 @@
            (do
              (error "Error in node" (:url @node) ":" e)
              (restart-agent node @node))))
-       ;(info "Start:" (:url @node))
        (send node process-request request)
-       ;(info "End:" (:url @node))
        {:status 200
         :headers {"Content-Type" "text/html"}
-        :body "OK"})
-     '{:keywords? true} )))
+        :body "OK"}))))
 
 
 
@@ -48,6 +44,8 @@
 
 (defn start-node-server [server]
   (.start server))
+
+
 
 
 
