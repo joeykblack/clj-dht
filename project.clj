@@ -1,6 +1,6 @@
-(defproject dht "0.0.1-SNAPSHOT"
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
+(defproject dht "0.2.0-SNAPSHOT"
+  :description "Distributed hash table implementation"
+  :url "https://github.com/joeykblack/clj-dht"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.5.1"]
@@ -16,7 +16,8 @@
   :plugins [[lein-midje "3.0.0"]
             [lein-ring "0.8.7"]]
   :aot :all)
-  ;:ring {:handler dht.net/app})
+
+
 
 
 

@@ -11,6 +11,7 @@
 
 
 (defn- responsible? [this key]
+  "Is this node responsible for key?"
   (let [myurl (:url this)
         mysha (sha1 myurl)
         last (:last this)
@@ -32,20 +33,17 @@
       (< (compare mysha shalast) 0)))))
 
 (defn- get-next [this key]
+  "Get next node. TODO: use finger table."
   (:next this))
 
-;; Receive Content
-;; {:receive-content
-;;   {:value value that I asked for}}
+
 (defn receive-content [this params]
+  "Receive content. Format: {:receive-content {:value value that I asked for}}"
   (info "Receiving:" (:value params))
   this)
 
 
 ;; Get
-;; {:get-value
-;;      {:key key
-;;       :return-to where to return value}}
 
 (defn- forward-get [this params]
   (send-content
@@ -53,6 +51,7 @@
    {:get-value params}))
 
 (defn get-value [this params]
+  "Get value. Format: {:get-value {:key key :return-to where to return value}}"
   (let [sha (sha1 (:key params))]
     (if (responsible? this sha)
       (return-content (:return-to params)
@@ -63,9 +62,6 @@
 
 
 ;; Put
-;;    {put-value
-;;      {:key key
-;;       :value value}}
 
 (defn- forward-put [this params]
   (send-content
@@ -73,6 +69,7 @@
    {:put-value params}))
 
 (defn put-value [this params]
+  "Put value in DHT. Format: {:put-value {:key key :value value}}"
   (let [sha (sha1 (:key params))]
     (if (responsible? this sha)
       (assoc-in this [:map sha] (:value params))
@@ -126,9 +123,11 @@
 
 
 (defn update-node [this params]
+  "Merge in updates sent from other nodes."
   (merge this params))
 
 (defn add-node [this params]
+  "Add node to DHT. Format: {:add-node {:url URL of new node}}"
   (let [url (:url params)
         sha (sha1 url)]
     (if (responsible? this sha)
@@ -139,17 +138,26 @@
 ;; Util
 
 (defn log-node-state [this params]
-  (info "Node:" (:last this) ">" (:url this) ">" (:next this))
+  "Log node pointers and values. Format: {:log-node-state {}}"
+  (info "Node:" (:last this) "->" (:url this) "->" (:next this))
   (info "  Values:" (map val (:map this)))
   this)
 
 (defn log-node-state-full [this params]
-  (info "Node:" (:last this) ">" (:url this) ">" (:next this))
+  "Log node pointers and map. Format: {:log-node-state-full {}}"
+  (info "Node:" (:last this) "->" (:url this) "->" (:next this))
   (info "  Map:" (:map this))
   this)
 
 (defn reset-node [this params]
+  "Reset node"
   (make-node (:url params)))
+
+
+
+
+
+
 
 
 

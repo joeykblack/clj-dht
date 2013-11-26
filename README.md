@@ -1,4 +1,4 @@
-# dht 0.1.0
+# clj-dht 0.2.0
 
 by [Joey K Black](joey-black.appspot.com)
 
@@ -11,7 +11,6 @@ To start node servers:
 (use 'dht.net.serve)
 (defonce server1 (make-node-server "URL" port))
 (defonce server2 (make-node-server "http://localhost:3002" 3002))
-(defonce server3 (make-node-server "http://localhost:3003" 3003))
 ```
 
 To add nodes to the DHT:
@@ -40,8 +39,10 @@ To get a value from the DHT:
 
 To stop a node server:
 ```clojure
-(.stop server1)
+(stop-node-server server1)
 ```
+
+See repl/dht/test.clj for more examples.
 
 
 ## License
@@ -49,6 +50,12 @@ To stop a node server:
 Copyright © 2013
 
 Distributed under the Eclipse Public License, the same as Clojure.
+
+
+
+
+
+
 
 
 

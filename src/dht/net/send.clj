@@ -4,26 +4,29 @@
 
 
 (defn send-content [url content]
-  ;(debug url ":" content)
-  (info "Send:" content "to" url)
+  "Wrap content as json and send to URL"
   (let [resp (client/post url {:form-params {:dht content}
                                :content-type :json})]
     (if (not= 200 (:status resp))
       (error resp))))
 
 (defn return-content [return-to content]
-  ;(debug return-to ":" content)
+  "Wrap content as json and send to URL"
   (let [resp (client/post return-to {:form-params {:dht content}
                                      :content-type :json})]
     (if (not= 200 (:status resp))
       (error resp))))
 
 (defn send-content-test [url content]
-  ;(debug url ":" content)
+  "Wrap content as json and send to URL"
   (let [resp (client/post url {:form-params {:dht content}
                                :content-type :json})]
     (if (not= 200 (:status resp))
       (error resp))))
+
+
+
+
 
 
 
