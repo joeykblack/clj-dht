@@ -1,6 +1,6 @@
 # clj-dht 0.2.0
 
-by [Joey K Black](joey-black.appspot.com)
+by [Joey K Black](http://joey-black.appspot.com)
 
 Distributed hash table implementation
 
@@ -60,4 +60,5 @@ Distributed under the Eclipse Public License, the same as Clojure.
 
 
 
-
+
+
